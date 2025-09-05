@@ -1,14 +1,5 @@
 {
   "officialProof": null,
   "officialHolidays": [],
-  "specialHolidays": [
-    {
-      "name": "Yeye",
-      "start": "2025-09-05",
-      "end": "2025-09-06",
-      "desc": "",
-      "bullets": [],
-      "proof": null
-    }
-  ]
+  "specialHolidays": []
 }
