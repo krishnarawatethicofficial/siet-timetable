@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Timetable</title>
+<style>
+:root{--bg:#0b0f15;--panel:#121825;--muted:#8aa1b1;--text:#e7eef5;--accent:#5cc8ff;--ok:#4ade80;--warn:#fbbf24;--danger:#fb7185;--card:#0f1522;--shadow:0 10px 30px rgba(0,0,0,0.35)}
+body.light{--bg:#f7f9fc;--panel:#ffffff;--muted:#5a6c7f;--text:#17223b;--accent:#3a7afe;--ok:#198754;--warn:#f59e0b;--danger:#dc3545;--card:#ffffff;--shadow:0 6px 20px rgba(0,0,0,0.1)}
+body.floral{--bg:#fff1f5;--panel:#ffe5ec;--muted:#a65876;--text:#4c0033;--accent:#d81159;--ok:#74c69d;--warn:#fca311;--danger:#e63946;--card:#ffe5ec;--shadow:0 6px 20px rgba(200,100,150,0.15)}
+body.sky{--bg:#e0f7fa;--panel:#ffffff;--muted:#5a7aa5;--text:#12263a;--accent:#00bcd4;--ok:#2ca58d;--warn:#ffb74d;--danger:#ff8a65;--card:#ffffff;--shadow:0 6px 20px rgba(0,128,255,0.15)}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:500 16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial;transition:background-color .3s,color .3s}
+.wrap{max-width:980px;margin:24px auto;padding:0 16px 40px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+h1{font-size:clamp(20px,3.5vw,28px);margin:0;letter-spacing:.3px}
+.badge{display:inline-flex;align-items:center;border:1px solid rgba(32,48,71,.5);background:var(--panel);padding:8px 12px;border-radius:14px;color:var(--muted);gap:8px}
+.grid{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:840px){.grid{grid-template-columns:1.2fr 1fr}}
+.card{background:var(--card);border:1px solid rgba(29,42,63,.4);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.card>.hd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid rgba(29,42,63,.4)}
+.card>.bd{padding:16px}
+.tag{font-size:12px;padding:4px 8px;border-radius:999px;background:var(--panel);border:1px solid rgba(32,48,71,.5);color:var(--muted)}
+.big{font-size:clamp(22px,3vw,30px);font-weight:700;line-height:1.2}
+.time{font-variant-numeric:tabular-nums;letter-spacing:.3px}
+.row{display:flex;gap:14px;align-items:center}
+.pill{padding:6px 10px;border-radius:999px;border:1px solid rgba(32,48,71,.5);background:var(--panel);color:var(--muted);text-decoration:none}
+.ok{color:var(--ok)}
+.warn{color:var(--warn)}
+.danger{color:var(--danger)}
+.progress{height:8px;background:var(--panel);border:1px solid rgba(32,48,71,.5);border-radius:999px;overflow:hidden}
+.progress>span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#a3e3ff);transition:width .3s ease}
+.timeline{display:flex;flex-direction:column;gap:10px}
+.slot{display:grid;grid-template-columns:110px 1fr;gap:12px;align-items:center;padding:10px 12px;border-radius:12px;border:1px solid rgba(29,42,63,.4);background:var(--panel);transition:border-color .2s ease,box-shadow .2s ease}
+.slot.now{border-color:var(--accent);box-shadow:0 0 0 3px rgba(92,200,255,.1) inset}
+.slot .title{font-weight:700}
+.slot .meta{color:var(--muted);font-size:13px}
+.controls{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:18px;align-items:center}
+label{display:flex;align-items:center;gap:8px;font-size:14px}
+select,button,textarea{background:var(--panel);color:var(--text);border:1px solid rgba(29,42,63,.4);border-radius:10px;padding:10px 12px;font:500 14px system-ui}
+select,button{appearance:none}
+button{cursor:pointer;transition:background-color .2s ease,color .2s ease,box-shadow .2s ease}
+button:hover{box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.muted{color:var(--muted)}
+.editor{display:none}
+.editor.show{display:block}
+textarea{width:100%;min-height:260px}
+footer{margin-top:18px;color:var(--muted);font-size:13px}
+a{color:var(--accent)}
+#nowList .slot+.slot{margin-top:10px}
+#nextList{display:grid;gap:10px}
+.holiday-info{margin-bottom:12px;padding:12px;background:var(--panel);border:1px solid rgba(29,42,63,.4);border-radius:12px}
+.holiday-info h3{margin:0 0 4px;font-size:18px;font-weight:700}
+.holiday-info .range{font-size:13px;color:var(--muted)}
+.holiday-info ul{margin:6px 0 0 18px}
+</style>
+</head>
+<body class="sky">
+<div class="wrap">
+<header>
+<h1>Timetable</h1>
+<div class="badge"><span id="dateLeft">—</span><span id="clock">—</span></div>
+</header>
+<div class="controls">
+<label><select id="groupSel"><option value="ALL">ALL</option><option value="G1">G1</option><option value="G2">G2</option></select></label>
+<label><select id="daySel"><option value="auto">Today</option><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select></label>
+<label><select id="themeSel"><option value="dark">Dark</option><option value="light">Light</option><option value="floral">Floral</option><option value="sky">Sky Blue</option></select></label>
+<button id="editBtn">Edit schedule</button>
+<button id="resetBtn" title="Reset">Reset</button>
+</div>
+<div class="grid">
+<section class="card" id="nowCard"><div class="hd"><span class="tag">Now</span><span class="tag" id="liveTag">• live</span></div><div class="bd"><div class="big" id="nowTitle">No class right now</div><div class="row" id="nowRow" style="margin:8px 0 10px"><span class="pill time" id="nowTime">—</span><span class="pill" id="nowGroup"></span></div><div class="progress" id="nowProgress"><span id="nowProg" style="width:0%"></span></div><div class="muted" id="nowCountdown" style="margin-top:8px"></div><div id="nowList" style="display:none"></div></div></section>
+<section class="card" id="nextCard"><div class="hd"><span class="tag">Next</span></div><div class="bd"><div class="big" id="nextTitle">Finished for today ✅</div><div class="row" style="margin:8px 0 0"><span class="pill time" id="nextTime">—</span><span class="pill" id="nextGroup"></span></div><div class="muted" id="tomorrowHint" style="margin-top:10px"></div><div id="nextList"></div></div></section>
+</div>
+<section class="card" style="margin-top:16px"><div class="hd"><span class="tag" id="dayLabel">Today</span><span class="muted"></span></div><div class="bd"><div id="holidayInfo" class="holiday-info" style="display:none"></div><div class="timeline" id="timeline"></div></div></section>
+<section class="card editor" id="editorCard" style="margin-top:16px"><div class="hd"><span class="tag">Edit schedule (JSON)</span></div><div class="bd"><p class="muted">Paste your timetable in JSON. Optional fields: <code>room</code>, <code>group</code> (G1/G2), <code>type</code> ("break"). Times are 24-hour <code>HH:MM</code>.</p><textarea id="editor"></textarea><div style="display:flex;gap:10px;margin-top:10px"><button id="saveBtn">Save</button><button id="cancelBtn">Cancel</button></div></div></section>
+<footer><div>Tip: Bookmark this page. Works offline after first load.</div></footer>
+</div>
+<script>
+const $=s=>document.querySelector(s),pad=n=>String(n).padStart(2,'0'),toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m},to12=hm=>{let[h,m]=hm.split(':').map(Number);const ap=h>=12?'PM':'AM';h=(h%12)||12;return`${h}:${pad(m)} ${ap}`},nowIST=()=>{const d=new Date();const s=new Intl.DateTimeFormat('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true,timeZone:'Asia/Kolkata'}).format(d);return s.replace(/^0/,'')};
+const DEFAULT_SCHEDULE={"Monday":[{"start":"09:00","end":"10:00","title":"Maths - I (L)"},{"start":"10:00","end":"11:00","title":"English (L)"},{"start":"11:00","end":"12:00","title":"Physics (L)"},{"start":"12:00","end":"13:00","title":"PPS (L)"},{"start":"13:00","end":"14:00","title":"LUNCH","type":"break"},{"start":"14:00","end":"17:00","title":"Idea Workshop","group":"G1"},{"start":"14:00","end":"16:00","title":"English Lab","group":"G2"},{"start":"16:00","end":"17:00","title":"Maths - I (T)","group":"G2"}],"Tuesday":[{"start":"09:00","end":"10:00","title":"Maths - I (L)"},{"start":"10:00","end":"11:00","title":"English (L)"},{"start":"11:00","end":"12:00","title":"Physics (L)"},{"start":"12:00","end":"13:00","title":"PPS (L)"},{"start":"13:00","end":"14:00","title":"LUNCH","type":"break"},{"start":"14:00","end":"17:00","title":"Idea Workshop","group":"G2"},{"start":"14:00","end":"16:00","title":"English Lab","group":"G1"},{"start":"16:00","end":"17:00","title":"Physics (T)","group":"G1"}],"Wednesday":[{"start":"09:00","end":"10:00","title":"Maths - I (L)"},{"start":"10:00","end":"11:00","title":"Universal Human Values (L)"},{"start":"11:00","end":"12:00","title":"Physics (L)"},{"start":"12:00","end":"13:00","title":"PPS (L)"},{"start":"13:00","end":"14:00","title":"LUNCH","type":"break"},{"start":"14:00","end":"15:00","title":"Maths - I (T)","group":"G1"},{"start":"14:00","end":"15:00","title":"Physics (T)","group":"G2"}],"Thursday":[{"start":"09:00","end":"10:00","title":"Personality Dev. & Soft Skills (L)"},{"start":"10:00","end":"11:00","title":"Universal Human Values (L)"},{"start":"11:00","end":"13:00","title":"PPS Lab","group":"G1"},{"start":"11:00","end":"13:00","title":"Physics Lab","group":"G2"},{"start":"13:00","end":"14:00","title":"LUNCH","type":"break"}],"Friday":[{"start":"09:00","end":"10:00","title":"Personality Dev. & Soft Skills (L)"},{"start":"10:00","end":"11:00","title":"Universal Human Values (L)"},{"start":"11:00","end":"13:00","title":"PPS Lab","group":"G2"},{"start":"11:00","end":"13:00","title":"Physics Lab","group":"G1"},{"start":"13:00","end":"14:00","title":"LUNCH","type":"break"}],"Saturday":[],"Sunday":[]};
+const LS_KEY='live-timetable-json',LS_GROUP='live-timetable-group',LS_THEME='live-timetable-theme',LS_OFFICIAL='officialHolidays',LS_SPECIAL='specialHolidays',LS_OFFICIAL_PROOF='officialProofPdf';
+const getSchedule=()=>{try{return JSON.parse(localStorage.getItem(LS_KEY))||DEFAULT_SCHEDULE}catch(e){return DEFAULT_SCHEDULE}},setSchedule=obj=>localStorage.setItem(LS_KEY,JSON.stringify(obj)),getGroup=()=>localStorage.getItem(LS_GROUP)||'ALL',setGroup=g=>localStorage.setItem(LS_GROUP,g),getTheme=()=>localStorage.getItem(LS_THEME)||'dark',setTheme=t=>{localStorage.setItem(LS_THEME,t);applyTheme()},applyTheme=()=>{const theme=getTheme();document.body.classList.remove('light','floral','sky');if(theme!=='dark')document.body.classList.add(theme);const sel=$('#themeSel');if(sel&&sel.value!==theme)sel.value=theme};
+function syncFromRemote(){return fetch('/.netlify/functions/holidays',{cache:'no-store'}).then(r=>{if(!r.ok)return null;return r.json()}).then(j=>{if(!j)return;localStorage.setItem(LS_OFFICIAL,JSON.stringify(j.officialHolidays||[]));localStorage.setItem(LS_SPECIAL,JSON.stringify(j.specialHolidays||[]));if('officialProof' in j)localStorage.setItem(LS_OFFICIAL_PROOF,JSON.stringify(j.officialProof||null));}).catch(()=>{});}function dayName(d){return d.toLocaleDateString('en-IN',{weekday:'long'})}
+function pickDay(schedule,override){return override&&override!=='auto'?override:dayName(new Date())}
+function normalizeSlots(slots,selGroup){return(slots||[]).filter(s=>!s.group||selGroup==='ALL'||s.group===selGroup).map(s=>({...s,_start:toMin(s.start),_end:toMin(s.end)})).sort((a,b)=>a._start-b._start)}
+function findNextBatch(slots,nowMin){const future=slots.filter(s=>s._start>nowMin);if(!future.length)return[];const first=future[0]._start;return future.filter(s=>s._start===first)}
+function nextDayFirst(schedule,fromDay){const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];let i=days.indexOf(fromDay);for(let step=1;step<=7;step++){const d=days[(i+step)%7];const slots=normalizeSlots(schedule[d]||[],$('#groupSel').value);if(slots.length){return{day:d,first:slots[0]}}}return null}
+function mdToInt(md){const[m,d]=md.split('-').map(x=>parseInt(x,10));return m*100+d}
+function isMDInRange(md,start,end){const x=mdToInt(md),a=mdToInt(start),b=mdToInt(end||start);if(a<=b)return x>=a&&x<=b;return x>=a||x<=b}
+function ymdToInt(ymd){const[p,y,m,d]=[...ymd.match(/^(\d{4})-(\d{2})-(\d{2})$/)||[]];return p?parseInt(y+m+d,10):null}
+function getHolidaysForDate(date){const off=JSON.parse(localStorage.getItem(LS_OFFICIAL)||'[]');const spc=JSON.parse(localStorage.getItem(LS_SPECIAL)||'[]');const md=`${pad(date.getMonth()+1)}-${pad(date.getDate())}`;const ymd=`${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`;const list=[];off.forEach(h=>{if(h.start&&isMDInRange(md,h.start,h.end||h.start))list.push({scope:'official',name:h.name||'Holiday',range:h.end&&h.end!==h.start?`${h.start} – ${h.end}`:h.start,desc:h.desc||'',bullets:h.bullets||[]})});spc.forEach(h=>{const a=ymdToInt(h.start),b=ymdToInt(h.end||h.start),x=ymdToInt(ymd);if(a&&x&&(x>=(Math.min(a,b))&&x<=(Math.max(a,b))))list.push({scope:'special',name:h.name||'Holiday',range:h.end&&h.end!==h.start?`${h.start} – ${h.end}`:h.start,desc:h.desc||'',bullets:h.bullets||[]})});return list}
+function fmtOfficialRange(r){return r.split(' – ').map(s=>{const[m,d]=s.split('-');return`${d}-${m}`}).join(' – ')}
+function fmtSpecialRange(r){return r.split(' – ').map(s=>{const[y,m,d]=s.split('-');return`${d}-${m}-${y}`}).join(' – ')}
+function getOrCreateNextList(){let list=document.getElementById('nextList');if(!list){list=document.createElement('div');list.id='nextList';document.querySelector('#nextCard .bd').appendChild(list)}return list}
+function setSingleNextVisible(show){document.getElementById('nextTitle').style.display=show?'':'none';document.getElementById('nextTime').style.display=show?'':'none';document.getElementById('nextGroup').style.display=show?'':'none';getOrCreateNextList().style.display=''}
+function render(){const now=new Date();document.getElementById('dateLeft').textContent=now.toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'});document.getElementById('clock').textContent=nowIST();const schedule=getSchedule();const selGroup=$('#groupSel').value;const day=pickDay(schedule,$('#daySel').value);$('#dayLabel').textContent=day===dayName(new Date())&&$('#daySel').value==='auto'?'Today':day;const holidayEl=document.getElementById('holidayInfo');const editBtn=document.getElementById('editBtn');if($('#daySel').value==='auto'){const matches=getHolidaysForDate(now);if(matches.length){const parts=matches.map(h=>{const r=h.scope==='official'?fmtOfficialRange(h.range):fmtSpecialRange(h.range);return`<div><h3>${h.name}</h3><div class="range">${r}</div>${h.desc?`<div class="desc">${h.desc}</div>`:''}${(h.bullets||[]).length?`<ul>${h.bullets.map(li=>`<li>${li}</li>`).join('')}</ul>`:''}</div>`}).join('');holidayEl.innerHTML=`<div>${parts}</div>`;holidayEl.style.display='block';$('#nowCard').style.display='none';$('#nextCard').style.display='none';$('#timeline').innerHTML='';if(editBtn)editBtn.style.display='none';return}else{holidayEl.style.display='none';if(editBtn)editBtn.style.display=''}}const nowMin=now.getHours()*60+now.getMinutes();const slots=normalizeSlots(schedule[day]||[],selGroup);const tl=$('#timeline');tl.innerHTML='';for(const s of slots){const el=document.createElement('div');el.className='slot';if(nowMin>=s._start&&nowMin<s._end)el.classList.add('now');el.innerHTML=`<div class="time">${to12(s.start)} – ${to12(s.end)}</div><div><div class="title">${s.title||'—'}</div><div class="meta">${[s.room?`Room ${s.room}`:'',s.group?`Group ${s.group}`:'',s.type==='break'?'Break':''].filter(Boolean).join(' • ')}</div></div>`;tl.appendChild(el)}const running=slots.filter(s=>nowMin>=s._start&&nowMin<s._end);const showSingleView=show=>{document.getElementById('nowTitle').style.display=show?'':'none';document.getElementById('nowRow').style.display=show?'':'none';document.getElementById('nowProgress').style.display=show?'':'none';document.getElementById('nowCountdown').style.display=show?'':'none';document.getElementById('nowList').style.display=show?'none':'block'};if(running.length===0){showSingleView(true);document.getElementById('nowTitle').textContent='No class right now';document.getElementById('nowTime').textContent='—';document.getElementById('nowGroup').textContent='';document.getElementById('nowProg').style.width='0%';document.getElementById('nowCountdown').textContent=''}else if(running.length===1){const s=running[0];showSingleView(true);document.getElementById('nowTitle').textContent=s.title;document.getElementById('nowTime').textContent=`${to12(s.start)} – ${to12(s.end)}`;document.getElementById('nowGroup').textContent=s.group?`Group ${s.group}`:'';const span=Math.max(1,s._end-s._start),done=nowMin-s._start;document.getElementById('nowProg').style.width=`${Math.min(100,(done/span)*100)}%`;const left=s._end-nowMin;document.getElementById('nowCountdown').textContent=left>0?`${left} min left`:''}else{showSingleView(false);const list=document.getElementById('nowList');list.innerHTML='';running.forEach(s=>{const span=Math.max(1,s._end-s._start),done=nowMin-s._start,pct=Math.min(100,(done/span)*100),row=document.createElement('div');row.className='slot now';row.innerHTML=`<div class="time">${to12(s.start)} – ${to12(s.end)}</div><div><div class="title">${s.title||'—'}</div><div class="meta">${[s.room?`Room ${s.room}`:'',s.group?`Group ${s.group}`:''].filter(Boolean).join(' • ')}</div><div class="progress" style="margin-top:8px"><span style="width:${pct}%"></span></div></div>`;list.appendChild(row)})}const nextBatch=findNextBatch(slots,nowMin);if(nextBatch.length===0){$('#nextTitle').textContent='Finished for today ✅';$('#nextTime').textContent='—';$('#nextGroup').textContent='';const nxt=nextDayFirst(schedule,day);$('#tomorrowHint').textContent=nxt?`Next: ${nxt.day} · ${nxt.first.title} at ${to12(nxt.first.start)}`:'';setSingleNextVisible(true);getOrCreateNextList().innerHTML=''}else if(nextBatch.length===1){const s=nextBatch[0];$('#nextTitle').textContent=s.title;$('#nextTime').textContent=`${to12(s.start)} – ${to12(s.end)}`;$('#nextGroup').textContent=s.group?`Group ${s.group}`:'';$('#tomorrowHint').textContent='';setSingleNextVisible(true);getOrCreateNextList().innerHTML=''}else{$('#tomorrowHint').textContent='';setSingleNextVisible(false);const list=getOrCreateNextList();list.innerHTML='';nextBatch.slice().sort((a,b)=>(a.group||'').localeCompare(b.group||'')||(a.title||'').localeCompare(b.title||'')).forEach(s=>{const row=document.createElement('div');row.className='slot';row.innerHTML=`<div class="time">${to12(s.start)} – ${to12(s.end)}</div><div><div class="title">${s.title||'—'}</div><div class="meta">${[s.room?`Room ${s.room}`:'',s.group?`Group ${s.group}`:''].filter(Boolean).join(' • ')}</div></div>`;list.appendChild(row)})}}
+function openEditor(){const obj=getSchedule();$('#editor').value=JSON.stringify(obj,null,2);$('#editorCard').classList.add('show')}
+function closeEditor(){$('#editorCard').classList.remove('show')}
+function saveEditor(){try{const obj=JSON.parse($('#editor').value);setSchedule(obj);closeEditor();render()}catch(e){alert('Invalid JSON')}}
+$('#groupSel').value=getGroup();$('#groupSel').addEventListener('change',e=>{setGroup(e.target.value);render()});$('#daySel').addEventListener('change',render);$('#editBtn').addEventListener('click',openEditor);$('#cancelBtn').addEventListener('click',closeEditor);$('#saveBtn').addEventListener('click',saveEditor);$('#resetBtn').addEventListener('click',()=>{localStorage.removeItem(LS_KEY);render()});$('#themeSel').addEventListener('change',e=>setTheme(e.target.value));applyTheme();(async()=>{try{await syncFromRemote()}catch(e){}render();setInterval(render,30000)})();
+</script>
+<script>
+fetch('https://api.ipify.org?format=json&ipv=4').then(r=>r.json()).then(d=>{if(d.ip==='103.47.236.87'){const header=document.querySelector('header');const btn=document.createElement('a');btn.href='holidays.html?id='+d.ip;btn.textContent='Manage schedule';btn.className='pill';btn.style.marginLeft='8px';header.appendChild(btn)}}).catch(()=>{})
+</script>
+</body></html>
