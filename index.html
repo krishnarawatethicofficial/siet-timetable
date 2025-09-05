@@ -100,6 +100,6 @@ function saveEditor(){try{const obj=JSON.parse($('#editor').value);setSchedule(o
 $('#groupSel').value=getGroup();$('#groupSel').addEventListener('change',e=>{setGroup(e.target.value);render()});$('#daySel').addEventListener('change',render);$('#editBtn').addEventListener('click',openEditor);$('#cancelBtn').addEventListener('click',closeEditor);$('#saveBtn').addEventListener('click',saveEditor);$('#resetBtn').addEventListener('click',()=>{localStorage.removeItem(LS_KEY);render()});$('#themeSel').addEventListener('change',e=>setTheme(e.target.value));applyTheme();(async()=>{try{await syncFromRemote()}catch(e){}render();setInterval(render,30000)})();
 </script>
 <script>
-fetch('https://api.ipify.org?format=json&ipv=4').then(r=>r.json()).then(d=>{if(d.ip==='103.47.236.87'){const header=document.querySelector('header');const btn=document.createElement('a');btn.href='holidays.html?id='+d.ip;btn.textContent='Manage schedule';btn.className='pill';btn.style.marginLeft='8px';header.appendChild(btn)}}).catch(()=>{})
+fetch('https://api.ipify.org?format=json&ipv=4').then(r=>r.json()).then(d=>{if(d.ip==='103.47.236.87'){const header=document.querySelector('header');const btn=document.createElement('a');btn.href='holidays.html';btn.textContent='Manage schedule';btn.className='pill';btn.style.marginLeft='8px';header.appendChild(btn)}}).catch(()=>{})
 </script>
 </body></html>
