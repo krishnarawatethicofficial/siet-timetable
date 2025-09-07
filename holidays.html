@@ -86,9 +86,7 @@ document.getElementById('testBtn').addEventListener('click',testConnection);
 document.getElementById('exportBtn').addEventListener('click',()=>{const d=loadHolidays();const blob=new Blob([JSON.stringify({officialHolidays:d.official,specialHolidays:d.special,officialProof:d.proof},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='holidays-export.json';a.click();URL.revokeObjectURL(a.href)});
 document.getElementById('importBtn').addEventListener('click',()=>$('#importJson').click());
 document.getElementById('importJson').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const fr=new FileReader();fr.onload=()=>{try{const j=JSON.parse(fr.result);const official=j.officialHolidays||[];const special=j.specialHolidays||[];const proof=j.officialProof||null;saveHolidays({official,special,proof});renderLists();publish()}catch{alert('Invalid JSON')}};fr.readAsText(f)});
-const h=document.querySelector('h1');if(h){h.style.cursor='pointer';h.onclick=()=>{if(window.netlifyIdentity&&!netlifyIdentity.currentUser())netlifyIdentity.open('login')}};
-applyTheme();document.getElementById('dateLabel').textContent=fmtDateHuman(new Date());renderLists();testConnection()}
-function show404(){document.body.innerHTML='<div style="min-height:100vh;display:grid;place-items:center;background:#0b0f15;color:#e7eef5"><div style="text-align:center"><div style="font:700 42px system-ui;margin-bottom:8px">404</div><div class="muted">Page not found</div></div></div>'}
-if(window.netlifyIdentity){netlifyIdentity.on('init',u=>{if(u){if(isOwner()){bindUI()}else{show404()}}else{netlifyIdentity.open('login')}});netlifyIdentity.on('login',()=>location.reload());netlifyIdentity.on('logout',()=>location.reload());netlifyIdentity.init()}else{show404()}
+const h=document.querySelector('h1');if(h){h.style.cursor='pointer';h.onclick=()=>{if(window.netlifyIdentity&&!netlifyIdentity.currentUser())netlifyIdentity.open('login')}}}
+document.addEventListener('DOMContentLoaded',()=>{bindUI();applyTheme();document.getElementById('dateLabel').textContent=fmtDateHuman(new Date());renderLists();testConnection();if(window.netlifyIdentity){netlifyIdentity.on('init',()=>{});netlifyIdentity.on('login',()=>{renderLists()});netlifyIdentity.on('logout',()=>{});netlifyIdentity.init()}});
 </script>
 </body></html>
