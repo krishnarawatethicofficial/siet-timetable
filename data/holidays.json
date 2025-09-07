@@ -1,6 +1,16 @@
 {
   "officialProof": null,
-  "officialHolidays": [],
+  "officialHolidays": [
+    {
+      "name": "test",
+      "start": "09-07",
+      "end": "09-07",
+      "desc": "ed",
+      "bullets": [
+        "dddddddd"
+      ]
+    }
+  ],
   "specialHolidays": [
     {
       "name": "Panckula OFF",
