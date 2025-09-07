@@ -73,7 +73,7 @@ a{color:var(--accent)}
 </div>
 <section class="card" style="margin-top:16px"><div class="hd"><span class="tag" id="dayLabel">Today</span><span class="muted"></span></div><div class="bd"><div id="holidayInfo" class="holiday-info" style="display:none"></div><div class="timeline" id="timeline"></div></div></section>
 <section class="card editor" id="editorCard" style="margin-top:16px"><div class="hd"><span class="tag">Edit schedule (JSON)</span></div><div class="bd"><textarea id="editor"></textarea><div style="display:flex;gap:10px;margin-top:10px"><button id="saveBtn">Save</button><button id="cancelBtn">Cancel</button></div></div></section>
-<footer><div>Tip: Bookmark this page. Works offline after first load.</div></footer>
+<footer><a href="https://kuk.ac.in/wp-content/uploads/2025/02/List-of-Holidays-for-the-Calendar-Year-2025.pdf" target="_blank" rel="noopener">List of Holidays (KUK)</a></footer>
 </div>
 <script>
 const $=s=>document.querySelector(s),pad=n=>String(n).padStart(2,'0'),toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m},to12=hm=>{let[h,m]=hm.split(':').map(Number);const ap=h>=12?'PM':'AM';h=(h%12)||12;return h+':'+pad(m)+' '+ap},nowIST=()=>{const d=new Date();const s=new Intl.DateTimeFormat('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true,timeZone:'Asia/Kolkata'}).format(d);return s.replace(/^0/,'')};
