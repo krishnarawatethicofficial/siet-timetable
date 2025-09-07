@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Holiday Manager</title>
 <style>
 :root{--bg:#0b0f15;--panel:#121825;--muted:#8aa1b1;--text:#e7eef5;--accent:#5cc8ff;--ok:#4ade80;--warn:#fbbf24;--danger:#fb7185;--card:#0f1522;--shadow:0 10px 30px rgba(0,0,0,.35)}
@@ -80,16 +79,16 @@ function bindUI(){document.getElementById('officialForm').addEventListener('subm
 document.getElementById('specialForm').addEventListener('submit',async e=>{e.preventDefault();const name=$('#specName').value.trim();const start=$('#specStart').value;const end=$('#specEnd').value||start;const desc=$('#specDesc').value.trim();const bullets=bulletsFromTextarea($('#specBullets').value);if(!name||!start)return;let proof=null;const file=$('#specProof').files[0];if(file){if(file.size>2*1024*1024){alert('PDF too large (>2MB).');return}const dataUrl=await readFileAsDataURL(file);proof={name:file.name,type:file.type,dataUrl}}const data=loadHolidays();data.special.push({name,start,end,desc,bullets,proof});saveHolidays(data);$('#specName').value='';$('#specStart').value='';$('#specEnd').value='';$('#specDesc').value='';$('#specBullets').value='';$('#specProof').value='';renderLists();publish()});
 document.getElementById('saveOfficialProof').addEventListener('click',async()=>{const file=$('#officialProof').files[0];if(!file){alert('Choose a PDF first.');return}if(file.size>2*1024*1024){alert('PDF too large (>2MB).');return}const dataUrl=await readFileAsDataURL(file);const data=loadHolidays();data.proof={name:file.name,type:file.type,dataUrl};saveHolidays(data);$('#officialProof').value='';renderLists();publish()});
 document.getElementById('removeOfficialProof').addEventListener('click',()=>{const data=loadHolidays();data.proof=null;saveHolidays(data);renderLists();publish()});
-document.getElementById('officialList').addEventListener('click',e=>{const btn=e.target.closest('button');if(!btn)return;const idx=+btn.getAttribute('data-idx');const type=btn.getAttribute('data-type');const act=btn.getAttribute('data-act');const data=loadHolidays();if(act==='del'){data.official.splice(idx,1);saveHolidays(data);renderLists();publish()}if(act==='edit'){startEdit(type,idx)}})
-document.getElementById('specialList').addEventListener('click',e=>{const btn=e.target.closest('button');if(!btn)return;const idx=+btn.getAttribute('data-idx');const type=btn.getAttribute('data-type');const act=btn.getAttribute('data-act');const data=loadHolidays();if(act==='del'){data.special.splice(idx,1);saveHolidays(data);renderLists();publish()}if(act==='edit'){startEdit(type,idx)}})
-document.getElementById('themeSel').addEventListener('change',e=>{localStorage.setItem(LS_THEME,e.target.value);applyTheme()})
-document.getElementById('testBtn').addEventListener('click',testConnection)
-document.getElementById('exportBtn').addEventListener('click',()=>{const d=loadHolidays();const blob=new Blob([JSON.stringify({officialHolidays:d.official,specialHolidays:d.special,officialProof:d.proof},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='holidays-export.json';a.click();URL.revokeObjectURL(a.href)})
-document.getElementById('importBtn').addEventListener('click',()=>$('#importJson').click())
-document.getElementById('importJson').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const fr=new FileReader();fr.onload=()=>{try{const j=JSON.parse(fr.result);const official=j.officialHolidays||[];const special=j.specialHolidays||[];const proof=j.officialProof||null;saveHolidays({official,special,proof});renderLists();publish()}catch{alert('Invalid JSON')}};fr.readAsText(f)})
-const h=$('h1');if(h){h.style.cursor='pointer';h.onclick=()=>{if(!isOwner())netlifyIdentity.open('login')}}
-applyTheme();$('#dateLabel').textContent=fmtDateHuman(new Date());renderLists();testConnection()}
+document.getElementById('officialList').addEventListener('click',e=>{const btn=e.target.closest('button');if(!btn)return;const idx=+btn.getAttribute('data-idx');const type=btn.getAttribute('data-type');const act=btn.getAttribute('data-act');const data=loadHolidays();if(act==='del'){data.official.splice(idx,1);saveHolidays(data);renderLists();publish()}if(act==='edit'){startEdit(type,idx)}});
+document.getElementById('specialList').addEventListener('click',e=>{const btn=e.target.closest('button');if(!btn)return;const idx=+btn.getAttribute('data-idx');const type=btn.getAttribute('data-type');const act=btn.getAttribute('data-act');const data=loadHolidays();if(act==='del'){data.special.splice(idx,1);saveHolidays(data);renderLists();publish()}if(act==='edit'){startEdit(type,idx)}});
+document.getElementById('themeSel').addEventListener('change',e=>{localStorage.setItem(LS_THEME,e.target.value);applyTheme()});
+document.getElementById('testBtn').addEventListener('click',testConnection);
+document.getElementById('exportBtn').addEventListener('click',()=>{const d=loadHolidays();const blob=new Blob([JSON.stringify({officialHolidays:d.official,specialHolidays:d.special,officialProof:d.proof},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='holidays-export.json';a.click();URL.revokeObjectURL(a.href)});
+document.getElementById('importBtn').addEventListener('click',()=>$('#importJson').click());
+document.getElementById('importJson').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const fr=new FileReader();fr.onload=()=>{try{const j=JSON.parse(fr.result);const official=j.officialHolidays||[];const special=j.specialHolidays||[];const proof=j.officialProof||null;saveHolidays({official,special,proof});renderLists();publish()}catch{alert('Invalid JSON')}};fr.readAsText(f)});
+const h=document.querySelector('h1');if(h){h.style.cursor='pointer';h.onclick=()=>{if(window.netlifyIdentity&&!netlifyIdentity.currentUser())netlifyIdentity.open('login')}};
+applyTheme();document.getElementById('dateLabel').textContent=fmtDateHuman(new Date());renderLists();testConnection()}
 function show404(){document.body.innerHTML='<div style="min-height:100vh;display:grid;place-items:center;background:#0b0f15;color:#e7eef5"><div style="text-align:center"><div style="font:700 42px system-ui;margin-bottom:8px">404</div><div class="muted">Page not found</div></div></div>'}
-if(window.netlifyIdentity){netlifyIdentity.on('init',()=>{if(isOwner()){bindUI()}else{show404()}});netlifyIdentity.on('login',()=>location.reload());netlifyIdentity.on('logout',()=>location.reload());netlifyIdentity.init()}else{show404()}
+if(window.netlifyIdentity){netlifyIdentity.on('init',u=>{if(u){if(isOwner()){bindUI()}else{show404()}}else{netlifyIdentity.open('login')}});netlifyIdentity.on('login',()=>location.reload());netlifyIdentity.on('logout',()=>location.reload());netlifyIdentity.init()}else{show404()}
 </script>
 </body></html>
