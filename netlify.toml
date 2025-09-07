@@ -1,2 +1,7 @@
 [build]
   functions = "netlify/functions"
+[[redirects]]
+  from = "/logo"
+  to = "/use.png"
+  status = 301
+  force = true
