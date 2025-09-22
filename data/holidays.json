@@ -1,6 +1,14 @@
 {
   "officialProof": null,
-  "officialHolidays": [],
+  "officialHolidays": [
+    {
+      "name": "Navratri",
+      "start": "09-22",
+      "end": "09-23",
+      "desc": "",
+      "bullets": []
+    }
+  ],
   "specialHolidays": [
     {
       "name": "Panckula OFF",
